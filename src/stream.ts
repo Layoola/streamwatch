@@ -1,88 +1,133 @@
-const puppeteer = require("puppeteer-extra");
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
-const fs = require("fs");
+// const puppeteer = require("puppeteer-extra");
+// const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+// const fs = require("fs");
 
-puppeteer.use(StealthPlugin());
+// puppeteer.use(StealthPlugin());
 
-const twitterUsername = "your_username";
-const twitterPassword = "your_password";
-const accountToSearch = "elonmusk";
-const tweetsSet = new Set();
+// const BASE_URL = "https://twitter.com/";
+// const LOGIN_URL = "https://twitter.com/login";
 
-(async () => {
-    let browser:any;
-    try {
-        browser = await puppeteer.launch({ headless: false });
-        const page = await browser.newPage();
-        await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+// const twitterUsername = "your_username";
+// const twitterPassword = "your_password";
+// const accountToSearch = "elonmusk";
+// const tweetsSet = new Set();
 
-        console.log("Opening Twitter...");
-        await page.goto("https://twitter.com/login", { waitUntil: "networkidle2" });
+// (async () => {
+//   let browser: any;
+//   try {
+//     browser = await puppeteer.launch({
+//       headless: false,
+//       defaultViewport: {
+//         width: 1440,
+//         height: 1080,
+//       },
+//     });
+//     const page = await browser.newPage();
 
-        await page.waitForSelector('input[name="text"]', { visible: true });
-        await page.type('input[name="text"]', twitterUsername);
-        await page.keyboard.press("Enter");
-        await page.waitForTimeout(2000);
+//     console.log("Opening Twitter...");
+//     await page.goto(BASE_URL);
 
-        await page.waitForSelector('input[name="password"]', { visible: true });
-        await page.type('input[name="password"]', twitterPassword);
-        await page.keyboard.press("Enter");
+//     await page.waitForSelector('input[name="text"]', { visible: true });
+//     await page.type('input[name="text"]', twitterUsername);
+//     await page.keyboard.press("Enter");
+//     await page.waitForTimeout(2000);
 
-        console.log("Logging in...");
-        await page.waitForNavigation({ waitUntil: "networkidle2" });
+//     await page.waitForSelector('input[name="password"]', { visible: true });
+//     await page.type('input[name="password"]', twitterPassword);
+//     await page.keyboard.press("Enter");
 
-        await page.goto(`https://twitter.com/${accountToSearch}`, { waitUntil: "networkidle2" });
+//     console.log("Logging in...");
+//     await page.waitForNavigation({ waitUntil: "networkidle2" });
 
-        console.log(`Monitoring tweets from @${accountToSearch}...`);
+//     await page.goto(`https://twitter.com/${accountToSearch}`, {
+//       waitUntil: "networkidle2",
+//     });
 
-        async function scrapeTweets() {
-            try {
-                await page.reload({ waitUntil: "networkidle2" });
+//     console.log(`Monitoring tweets from @${accountToSearch}...`);
 
-                const newTweets = await page.evaluate(() => {
-                    return Array.from(document.querySelectorAll("article")).map(tweet => {
-                        const textElement = tweet.querySelector("div[lang]") as HTMLElement;
-                        const timestampElement = tweet.querySelector("time") as HTMLElement;
-                        const likeElement = tweet.querySelector('div[data-testid="like"]') as HTMLElement;
-                        const retweetElement = tweet.querySelector('div[data-testid="retweet"]') as HTMLElement;
-                        const replyElement = tweet.querySelector('div[data-testid="reply"]') as HTMLElement;
-                        const mediaElements = tweet.querySelectorAll('img[alt="Image"]') as NodeListOf<HTMLImageElement>;
-                        const tweetLinkElement = tweet.querySelector('a[href*="/status/"]') as HTMLAnchorElement;
+//     async function scrapeTweets() {
+//       try {
+//         await page.reload({ waitUntil: "networkidle2" });
 
-                        return {
-                            text: textElement ? textElement.innerText : null,
-                            timestamp: timestampElement ? timestampElement.getAttribute("datetime") : null,
-                            likes: likeElement ? likeElement.innerText || "0" : "0",
-                            retweets: retweetElement ? retweetElement.innerText || "0" : "0",
-                            replies: replyElement ? replyElement.innerText || "0" : "0",
-                            media: mediaElements.length > 0 ? Array.from(mediaElements).map(img => img.src) : [],
-                            tweetUrl: tweetLinkElement ? `https://twitter.com${tweetLinkElement.getAttribute("href")}` : null,
-                        };
-                    }).filter(tweet => tweet.text !== null);
-                });
+//         const newTweets = await page.evaluate(() => {
+//           return Array.from(document.querySelectorAll("article"))
+//             .map((tweet) => {
+//               const textElement = tweet.querySelector(
+//                 "div[lang]"
+//               ) as HTMLElement;
+//               const timestampElement = tweet.querySelector(
+//                 "time"
+//               ) as HTMLElement;
+//               const likeElement = tweet.querySelector(
+//                 'div[data-testid="like"]'
+//               ) as HTMLElement;
+//               const retweetElement = tweet.querySelector(
+//                 'div[data-testid="retweet"]'
+//               ) as HTMLElement;
+//               const replyElement = tweet.querySelector(
+//                 'div[data-testid="reply"]'
+//               ) as HTMLElement;
+//               const mediaElements = tweet.querySelectorAll(
+//                 'img[alt="Image"]'
+//               ) as NodeListOf<HTMLImageElement>;
+//               const tweetLinkElement = tweet.querySelector(
+//                 'a[href*="/status/"]'
+//               ) as HTMLAnchorElement;
 
-                newTweets.forEach((tweet: any) => {
-                    if (!tweetsSet.has(tweet.tweetUrl)) {
-                        tweetsSet.add(tweet.tweetUrl);
-                        console.log("New Tweet Found:", tweet);
-                        fs.appendFileSync("new_tweets.json", JSON.stringify(tweet, null, 2) + ",\n");
-                    }
-                });
+//               return {
+//                 text: textElement ? textElement.innerText : null,
+//                 timestamp: timestampElement
+//                   ? timestampElement.getAttribute("datetime")
+//                   : null,
+//                 likes: likeElement ? likeElement.innerText || "0" : "0",
+//                 retweets: retweetElement
+//                   ? retweetElement.innerText || "0"
+//                   : "0",
+//                 replies: replyElement ? replyElement.innerText || "0" : "0",
+//                 media:
+//                   mediaElements.length > 0
+//                     ? Array.from(mediaElements).map((img) => img.src)
+//                     : [],
+//                 tweetUrl: tweetLinkElement
+//                   ? `https://twitter.com${tweetLinkElement.getAttribute(
+//                       "href"
+//                     )}`
+//                   : null,
+//               };
+//             })
+//             .filter((tweet) => tweet.text !== null);
+//         });
 
-                console.log(`Checked for new tweets at ${new Date().toLocaleTimeString()}`);
-            } catch (error) {
-                console.error("Error while scraping tweets:", error);
-            }
-        }
+//         newTweets.forEach((tweet: any) => {
+//           if (!tweetsSet.has(tweet.tweetUrl)) {
+//             tweetsSet.add(tweet.tweetUrl);
+//             console.log("New Tweet Found:", tweet);
+//             fs.appendFileSync(
+//               "new_tweets.json",
+//               JSON.stringify(tweet, null, 2) + ",\n"
+//             );
+//           }
+//         });
 
-        setInterval(scrapeTweets, 60000);
-    } catch (error) {
-        console.error("Puppeteer script error:", error);
-    } finally {
-        process.on("SIGINT", async () => {
-            console.log("Closing browser...");
-            if (browser) await browser.close();
-            process.exit();
-        });
-    }
-})();
+//         console.log(
+//           `Checked for new tweets at ${new Date().toLocaleTimeString()}`
+//         );
+//       } catch (error) {
+//         console.error("Error while scraping tweets:", error);
+//       }
+//     }
+
+//     setInterval(scrapeTweets, 60000);
+//   } catch (error) {
+//     console.error("Puppeteer script error:", error);
+//   } finally {
+//     process.on("SIGINT", async () => {
+//       console.log("Closing browser...");
+//       if (browser) await browser.close();
+//       process.exit();
+//     });
+//   }
+// })();
+import { loginToTwitter } from "./services/authService";
+
+loginToTwitter();
