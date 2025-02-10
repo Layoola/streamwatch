@@ -44,7 +44,7 @@ const twitter = {
       // ✅ Check for successful login
       await page.waitForSelector('a[aria-label="Profile"]', { timeout: 5000 });
       console.log("✅ Login successful!");
-      return true;
+      return { browser, page };
     } catch (error) {
       // ❌ Check for login failure
       const errorText = await page.evaluate(() => {
