@@ -5,9 +5,6 @@ interface Tweet {
   text: string;
   username: string;
   timestamp: string;
-  likes: number;
-  retweets: number;
-  replies: number;
   tweetId: string;
 }
 
@@ -45,9 +42,6 @@ export class TwitterScraper {
         return {
           text: textElement?.textContent || "",
           timestamp: timeElement?.getAttribute("datetime") || "",
-          likes: parseInt(statsElements[0]?.textContent || "0"),
-          retweets: parseInt(statsElements[1]?.textContent || "0"),
-          replies: parseInt(statsElements[2]?.textContent || "0"),
           username:
             tweetElement.querySelector('div[data-testid="User-Name"]')
               ?.textContent || "",
@@ -110,5 +104,6 @@ export const startScraping = async (page: Page) => {
   const scraper = new TwitterScraper(page);
 
   // Start monitoring a user's tweets
+  //change to use cli input
   await scraper.monitorLatestTweets("olur0cks", 30000); // Check every 30 seconds
 };
