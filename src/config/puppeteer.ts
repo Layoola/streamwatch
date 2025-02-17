@@ -7,6 +7,8 @@ const LOGIN_URL = "https://twitter.com/login";
 let browser: any = null;
 let page: any = null;
 
+const USER_DATA_DIR = "./user_data";
+
 const twitter = {
   initialize: async () => {
     browser = await puppeteer.launch({
@@ -15,12 +17,23 @@ const twitter = {
         width: 1440,
         height: 1080,
       },
+      userDataDir: "./user_data",
     });
     page = await browser.newPage();
     await page.goto(BASE_URL);
     await new Promise((r) => setTimeout(r, 2000));
   },
   login: async (username: string, password: string) => {
+    const isSessionAvailable = fs.existsSync(USER_DATA_DIR);
+
+    if (isSessionAvailable) {
+      console.log("🔄 Using existing session, skipping login.");
+      return { browser, page };
+    }
+    console.log("🔑 No session found. Logging in...");
+
+    await new Promise((r) => setTimeout(r, 3000));
+
     await page.goto(LOGIN_URL);
     await page.waitForSelector('input[name="text"]', { visible: true });
     await page.type('input[name="text"]', username);

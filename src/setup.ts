@@ -3,9 +3,10 @@ import sequelize from "./config/database";
 // Function to initialize database
 const initializeDatabase = async () => {
   try {
-    await sequelize.authenticate(); 
+    await sequelize.authenticate();
     console.log("Database connection established successfully.");
-    await sequelize.sync({ alter: true });  
+    // await sequelize.sync({ alter: true });
+    await sequelize.sync();
     console.log("Database synced successfully.");
   } catch (error) {
     console.error("Database initialization failed:", error);

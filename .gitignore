@@ -2,3 +2,5 @@
 node_modules
 src/data/*
 media/*
+user_data
+src/..data/*
