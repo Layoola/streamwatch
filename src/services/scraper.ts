@@ -28,6 +28,7 @@ export class TwitterScraper {
         order: [["createdAt", "DESC"]],
       });
       if (latestTweet) {
+        //@ts-ignore
         this.lastKnownTweetId = latestTweet.id;
       }
     } catch (error) {
@@ -42,119 +43,74 @@ export class TwitterScraper {
 
       const videoUrls: string[] = [];
 
-          // Intercept network responses
-    const videoPromise = new Promise<string | null>((resolve) => {
-      this.page.on("response", async (response) => {
-        const url = response.url();
-        if (url.includes(".m3u8")) {
-          console.log("Captured video URL:", url);
-          videoUrls.push(url);
-          resolve(url); // Resolve with the first captured video URL
+      const latestTweet = await this.page.evaluate(() => {
+        const tweetElement = document.querySelector(
+          'article[data-testid="tweet"]'
+        );
+        if (!tweetElement) return null;
+
+        const tweetLink = tweetElement.querySelector('a[href*="/status/"]');
+        const tweetId = tweetLink?.getAttribute("href")?.split("/status/")[1];
+        const textElement = tweetElement.querySelector(
+          'div[data-testid="tweetText"]'
+        );
+        const timeElement = tweetElement.querySelector("time");
+
+        // Check for video content first
+        const videoPlayer = tweetElement.querySelector(
+          'div[data-testid="videoPlayer"]'
+        );
+        const videoElement = tweetElement.querySelector("video");
+        const hasVideo = !!(videoPlayer || videoElement);
+        //   console.log("Has video:", videoElement);
+
+        const mediaUrls: string[] = [];
+        //restore this //might not be needed
+        // If video exists, get its sources
+        console.log("Has video bool:", hasVideo);
+
+        if (hasVideo) {
+          // Get video thumbnail
+          const videoThumb = tweetElement.querySelector(
+            'img[src*="video_thumb"]'
+          );
+          if (videoThumb?.getAttribute("src")) {
+            mediaUrls.push(videoThumb.getAttribute("src")!);
+          }
+
+          // Get any available video source
+          if (videoElement) {
+            const sources = videoElement.querySelectorAll("source");
+            sources.forEach((source) => {
+              const src = source.getAttribute("src");
+              if (src) mediaUrls.push(src);
+            });
+          }
+          // } else {
+          //   // If no video, collect image URLs
+          const images = tweetElement.querySelectorAll("img[alt='Image']");
+          images.forEach((img) => {
+            const src = img.getAttribute("src");
+            if (src) mediaUrls.push(src);
+          });
+          // }
         }
+        return {
+          text: textElement?.textContent || "",
+          timestamp: timeElement?.getAttribute("datetime") || "",
+          username:
+            tweetElement.querySelector('div[data-testid="User-Name"]')
+              ?.textContent || "",
+          tweetId: tweetId || "",
+          tweetLink: tweetLink || "",
+          mediaUrls,
+          hasVideo,
+        };
       });
-
-      // Set a timeout in case no video is found
-      setTimeout(() => resolve(null), 5000);
-    });
-
-    // Wait for media content to load
-    // await this.page
-    //   .waitForFunction(
-    //     () => {
-    //       const video = document.querySelector("video");
-    //       const images = document.querySelectorAll("img[alt='Image']");
-    //       return video || images.length > 0;
-    //     },
-    //     { timeout: 5000 }
-    //   )
-    //   .catch(() => console.log("No media found or timeout"));
-
-    ///don't forget to add this back //important for video .... keeping
-    // this.page.on("response", async (response) => {
-    //   const url = response.url();
-    //   if (url.includes(".m3u8")) {
-    //     videoUrls.push(url);
-    //   }
-    // });
-    // console.log("videoUrls", videoUrls);
-    // this.page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
-
-    const latestTweet = await this.page.evaluate(() => {
-      const tweetElement = document.querySelector(
-        'article[data-testid="tweet"]'
-      );
-      if (!tweetElement) return null;
-
-      const tweetLink = tweetElement.querySelector('a[href*="/status/"]');
-      const tweetId = tweetLink?.getAttribute("href")?.split("/status/")[1];
-      const textElement = tweetElement.querySelector(
-        'div[data-testid="tweetText"]'
-      );
-      const timeElement = tweetElement.querySelector("time");
-
-      // Check for video content first
-      const videoPlayer = tweetElement.querySelector(
-        'div[data-testid="videoPlayer"]'
-      );
-      const videoElement = tweetElement.querySelector("video");
-      const hasVideo = !!(videoPlayer || videoElement);
-      //   console.log("Has video:", videoElement);
-
-      // Collect media URLs
-      const mediaUrls: string[] = [];
-
-      //restore this //might not be needed
-      // If video exists, get its sources
-      console.log("Has video bool:", hasVideo);
-
-      //     if (hasVideo) {
-      //       // Get video thumbnail
-      //       const videoThumb = tweetElement.querySelector(
-      //         'img[src*="video_thumb"]'
-      //       );
-      //       if (videoThumb?.getAttribute("src")) {
-      //         mediaUrls.push(videoThumb.getAttribute("src")!);
-      //       }
-
-      //       // Get any available video source
-      //       if (videoElement) {
-      //         const sources = videoElement.querySelectorAll("source");
-      //         sources.forEach((source) => {
-      //           const src = source.getAttribute("src");
-      //           if (src) mediaUrls.push(src);
-      //         });
-      //       }
-      //     // } else {
-      //     //   // If no video, collect image URLs
-      //     const images = tweetElement.querySelectorAll("img[alt='Image']");
-      //     images.forEach((img) => {
-      //       const src = img.getAttribute("src");
-      //       if (src) mediaUrls.push(src);
-      //     });
-      //     // }
-
-      // }
-      return {
-        text: textElement?.textContent || "",
-        timestamp: timeElement?.getAttribute("datetime") || "",
-        username:
-          tweetElement.querySelector('div[data-testid="User-Name"]')
-            ?.textContent || "",
-        tweetId: tweetId || "",
-        mediaUrls,
-        hasVideo,
-      };
-    });
 
       if (!latestTweet) {
         console.log("No tweets found");
         return null;
-      }
-
-      if (latestTweet.hasVideo) {
-        console.log("Waiting for video URL...");
-        const videoUrl = await videoPromise; // Wait for m3u8 link
-        if (videoUrl) latestTweet.mediaUrls.push(videoUrl);
       }
 
       if (videoUrls.length > 0) {

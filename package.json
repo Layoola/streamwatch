@@ -15,6 +15,7 @@
     "@types/express": "^5.0.0",
     "@types/minimist": "^1.2.5",
     "@types/node": "^22.13.1",
+    "@types/puppeteer": "^5.4.7",
     "@types/sequelize": "^4.28.20",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2"

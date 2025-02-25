@@ -1,6 +1,7 @@
 import { Page } from "puppeteer";
 import axios from "axios";
 import { Media } from "../models";
+import { scrapeAndDownload } from "../utils/helpers";
 const fs = require("fs");
 const path = require("path");
 
@@ -89,40 +90,6 @@ const getVideoUrl = async (page: Page): Promise<string | null> => {
   });
 };
 
-
-//redundant to be removed
-// async function handleBlobUrl(
-//   page: Page,
-//   blobUrl: string,
-//   outputPath: string
-// ): Promise<void> {
-//   try {
-//     // Extract video data from the blob URL
-//     const videoData = await page.evaluate(async (url) => {
-//       const response = await fetch(url);
-//       const blob = await response.blob();
-//       return new Promise((resolve) => {
-//         const reader = new FileReader();
-//         reader.onloadend = () => resolve(reader.result);
-//         reader.readAsArrayBuffer(blob);
-//       });
-//     }, blobUrl);
-
-//     // Convert ArrayBuffer to Buffer
-//     const videoBuffer = Buffer.from(videoData as ArrayBuffer);
-
-//     // Save the video buffer to a file
-//     fs.writeFileSync(outputPath, videoBuffer);
-//     console.log(`✅ Saved video file from blob URL at ${outputPath}`);
-//   } catch (error) {
-//     console.error("❌ Error handling blob URL:", error);
-//     throw error;
-//   }
-// }
-
-// Download video to check if the right video is being downloaded
-
-//this is to check if the right video is being downloaded //to be removed
 async function downloadVideo(
   videoUrl: string,
   outputPath: string
@@ -159,6 +126,7 @@ async function downloadVideo(
 export const saveMedia = async (
   page: Page,
   tweetId: string,
+  tweetLink: string,
   mediaUrls: string[],
   hasVideo: boolean = false
 ) => {
@@ -169,13 +137,12 @@ export const saveMedia = async (
 
   // If this is a video tweet, wait for network idle
   if (hasVideo) {
-    await page.waitForNetworkIdle({ timeout: 15000 }).catch(() => {});
+    await page.waitForTimeout(15000); // Waits for 15 seconds
   }
 
   const processedUrls = new Set(); // Avoid processing duplicate URLs
 
   for (const mediaUrl of mediaUrls) {
-    console.log("mediaUrl", mediaUrl);
     try {
       // Skip if already processed
       if (processedUrls.has(mediaUrl)) continue;
@@ -205,73 +172,13 @@ export const saveMedia = async (
       // Handle video thumbnail - try to get actual video
       else if (mediaUrl.includes("blob")) {
         // Wait for network idle to ensure video is loaded
-        await page.waitForNetworkIdle({ timeout: 5000 }).catch(() => {});
+        await page
+          .waitForNavigation({ waitUntil: "networkidle0", timeout: 15000 })
+          .catch(() => {});
 
-        const videoUrl = await getVideoUrl(page);
+        const videoBase64 = await scrapeAndDownload();
 
-        if (videoUrl) {
-          console.log(`🎥 Found video URL: ${videoUrl}`);
-
-          // const videoBase64 = await fetchVideoAsBase64(videoUrl, 30000);
-
-          // if (videoBase64) {
-          //     // Save videoBase64 to a file
-          //     const videoBuffer = Buffer.from(videoBase64.split(",")[1], "base64");
-          //     const videoFileName = `${tweetId}-${Date.now()}.mp4`;
-          //     const videoFilePath = path.join(MEDIA_DIR, videoFileName);
-
-          //     fs.writeFileSync(videoFilePath, videoBuffer);
-          //     console.log(
-          //         `✅ Saved video file for tweet ${tweetId} at ${videoFilePath}`
-          //     );
-
-          //     await Media.create({
-          //         tweet_id: tweetId,
-          //         media_base_64: videoBase64,
-          //         media_type: "mp4",
-          //     });
-
-          //     console.log(`✅ Saved video for tweet ${tweetId}`);
-          // } else {
-          //     console.log(`❌ Could not fetch video for tweet ${tweetId}`);
-          // }
-
-          // } else {
-          //     console.log(`❌ Could not find video URL for tweet ${tweetId}`);
-
-          //     // Fallback: save thumbnail if video URL not found
-          //     const response = await axios.get(mediaUrl, {
-          //         responseType: "arraybuffer",
-          //     });
-
-          //     const mediaBase64 = Buffer.from(response.data).toString("base64");
-
-          //     await Media.create({
-          //         tweet_id: tweetId,
-          //         media_base_64: mediaBase64,
-          //         media_type: "jpg",
-          //         // is_thumbnail: true, // Add this field to your Media model
-          //     });
-
-          //     console.log(`⚠️ Saved video thumbnail for tweet ${tweetId}`);
-          // }
-
-          //             }
-          //         } catch (error) {
-          //             console.error(`❌ Error saving media for tweet ${tweetId}:`, error);
-          //         }
-          //     }
-          // };
-          // Define the output path for the video
-          const videoFileName = `${tweetId}-${Date.now()}.mp4`;
-          const videoFilePath = path.join(MEDIA_DIR, videoFileName);
-
-          // Download the video directly to the folder
-          await downloadVideo(videoUrl, videoFilePath);
-
-          console.log(
-            `✅ Saved video file for tweet ${tweetId} at ${videoFilePath}`
-          );
+        if (videoBase64) {
         } else {
           console.log(`❌ Could not find video URL for tweet ${tweetId}`);
 
