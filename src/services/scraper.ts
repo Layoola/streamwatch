@@ -1,6 +1,6 @@
 import { Page } from "puppeteer";
 import { Tweet } from "../models";
-import { saveMedia } from "./mediaHandler";
+// import { saveMedia } from "./mediaHandler";
 import { response } from "express";
 
 //friendly reminder if it works don't touch it
@@ -11,166 +11,220 @@ interface ITweet {
   timestamp: string;
   tweetId: string;
   mediaUrls: string[];
-  hasVideo: boolean; // Add this flag
+  hasVideo: boolean;
 }
 
 export class TwitterScraper {
   private page: Page;
   private lastKnownTweetId: string | null = null;
+  private videoUrls: Set<string> = new Set();
+  private monitoringInterval: NodeJS.Timeout | null = null;
 
   constructor(page: Page) {
     this.page = page;
   }
-
-  async initializeLastKnownTweetId(): Promise<void> {
-    try {
-      const latestTweet = await Tweet.findOne({
-        order: [["createdAt", "DESC"]],
-      });
-      if (latestTweet) {
-        this.lastKnownTweetId = latestTweet.id;
-      }
-    } catch (error) {
-      console.error("Error fetching latest tweet ID from DB:", error);
+  async waitForCondition(conditionFn: () => Promise<boolean>, timeout: number, interval: number): Promise<void> {
+    const start = Date.now();
+    while (Date.now() - start < timeout) {
+      if (await conditionFn()) return;
+      await new Promise(res => setTimeout(res, interval));
     }
   }
+  
+
+  private setupVideoInterception(): void {
+    // Clear previous listeners to avoid duplicates
+    this.page.removeAllListeners('response');
+    this.videoUrls.clear();
+
+    this.page.on('response', async (response) => {
+      const url = response.url();
+      if (url.includes('.m3u8')) {
+        this.videoUrls.add(url);
+      }
+    });
+  }
+
+  // async getLatestTweet(username: string): Promise<ITweet | null> {
+  //   try {
+  //     this.setupVideoInterception();
+
+  //     await this.page.goto(`https://twitter.com/${username}`);
+  //     await this.page.waitForSelector('article[data-testid="tweet"]');
+
+  //     // First, check if there's a video in the tweet
+  //     const hasVideo = await this.page.evaluate(() => {
+  //       const tweetElement = document.querySelector('article[data-testid="tweet"]');
+  //       return !!(
+  //         tweetElement?.querySelector('div[data-testid="videoPlayer"]') ||
+  //         tweetElement?.querySelector('video')
+  //       );
+  //     });
+
+  //     let videoUrl: string | null = null;
+  //     if (hasVideo) {
+  //       // Wait for video to load and capture m3u8 URL
+  //       videoUrl = await Promise.race([
+  //         new Promise<string>((resolve) => {
+  //           const checkVideoUrls = setInterval(() => {
+  //             if (this.videoUrls.size > 0) {
+  //               clearInterval(checkVideoUrls);
+  //               resolve(Array.from(this.videoUrls)[0]);
+  //             }
+  //           }, 100);
+  //         }),
+  //         new Promise<string>((_, reject) => 
+  //           setTimeout(() => reject('Video URL timeout'), 5000)
+  //         )
+  //       ]).catch((error) => {
+  //         console.log('Error capturing video URL:', error);
+  //         return null;
+  //       });
+  //     }
+
+  //     const tweetData = await this.page.evaluate(() => {
+  //       const tweetElement = document.querySelector('article[data-testid="tweet"]');
+  //       if (!tweetElement) return null;
+
+  //       const tweetLink = tweetElement.querySelector('a[href*="/status/"]');
+  //       const tweetId = tweetLink?.getAttribute("href")?.split("/status/")[1];
+  //       const textElement = tweetElement.querySelector('div[data-testid="tweetText"]');
+  //       const timeElement = tweetElement.querySelector("time");
+
+  //       // Collect image URLs
+  //       const mediaUrls: string[] = [];
+  //       const images = tweetElement.querySelectorAll("img[alt='Image']");
+  //       images.forEach((img) => {
+  //         const src = img.getAttribute("src");
+  //         if (src) mediaUrls.push(src);
+  //       });
+
+  //       return {
+  //         text: textElement?.textContent || "",
+  //         timestamp: timeElement?.getAttribute("datetime") || "",
+  //         username: tweetElement.querySelector('div[data-testid="User-Name"]')?.textContent || "",
+  //         tweetId: tweetId || "",
+  //         mediaUrls,
+  //         hasVideo: false  // We'll set this later
+  //       };
+  //     });
+
+  //     if (!tweetData) return null;
+
+  //     // Add video URL if found
+  //     if (videoUrl) {
+  //       tweetData.mediaUrls.push(videoUrl);
+  //       tweetData.hasVideo = true;
+  //     }
+
+  //     if (this.lastKnownTweetId === tweetData.tweetId) {
+  //       console.log("No new tweets since last check");
+  //       return null;
+  //     }
+
+  //     this.lastKnownTweetId = tweetData.tweetId;
+  //     console.log("✅ New tweet found!");
+  //     return tweetData;
+  //   } catch (error) {
+  //     console.error("Error scraping latest tweet:", error);
+  //     return null;
+  //   }
+  // }
 
   async getLatestTweet(username: string): Promise<ITweet | null> {
     try {
+      // this.setupVideoInterception();
+      await this.page.evaluate(() => {
+        window.scrollTo(0, 0);
+      });
       await this.page.goto(`https://twitter.com/${username}`);
       await this.page.waitForSelector('article[data-testid="tweet"]');
 
-      const videoUrls: string[] = [];
+      const hasVideo = await this.page.evaluate(async() => {
+        const tweetElement = document.querySelector('article[data-testid="tweet"]');
+        return !!(
+          tweetElement?.querySelector('div[data-testid="videoPlayer"]') ||
+          tweetElement?.querySelector('video')
+        );});
 
-          // Intercept network responses
-    const videoPromise = new Promise<string | null>((resolve) => {
-      this.page.on("response", async (response) => {
-        const url = response.url();
-        if (url.includes(".m3u8")) {
-          console.log("Captured video URL:", url);
-          videoUrls.push(url);
-          resolve(url); // Resolve with the first captured video URL
-        }
+      let videoUrl: string | null = null;
+
+      if (hasVideo) {
+        console.log("⏳ Video detected, waiting for video URL to load...");
+        this.setupVideoInterception();
+
+        await this.page.reload();
+        await this.page.waitForSelector('article[data-testid="tweet"]');
+      
+        // Wait for some time (e.g., 3 seconds) to allow video to load
+        await this.waitForCondition(async () => {
+          return await this.page.evaluate(() => 
+            document.querySelector('video') !== null
+          );
+        }, 5000, 500);
+        
+        
+        // await this.page.waitForTimeout(3000);
+        videoUrl = await Promise.race([
+          new Promise<string>((resolve) => {
+            const checkVideoUrls = setInterval(() => {
+              if (this.videoUrls.size > 0) {
+                clearInterval(checkVideoUrls);
+                resolve(Array.from(this.videoUrls)[0]);
+              }
+            }, 3000);
+          }),
+          new Promise<string>((_, reject) => 
+            setTimeout(() => reject('Video URL timeout'), 5000)
+          )]).catch(() => null);
+      }
+
+      const tweetData = await this.page.evaluate(() => {
+        const tweetElement = document.querySelector('article[data-testid="tweet"]');
+        if (!tweetElement) return null;
+        const tweetLink = tweetElement.querySelector('a[href*="/status/"]');
+        const tweetId = tweetLink?.getAttribute("href")?.split("/status/")[1];
+        const textElement = tweetElement.querySelector('div[data-testid="tweetText"]');
+        const timeElement = tweetElement.querySelector("time");
+        const mediaUrls: string[] = [];
+        const images = tweetElement.querySelectorAll("img[alt='Image']");
+        images.forEach((img) => {
+          const src = img.getAttribute("src");
+          if (src) mediaUrls.push(src);
+        });
+
+      
+        return {
+          text: textElement?.textContent || "",
+          timestamp: timeElement?.getAttribute("datetime") || "",
+          username: tweetElement.querySelector('div[data-testid="User-Name"]')?.textContent || "",
+          tweetId: tweetId || "",
+          mediaUrls,
+          hasVideo: false
+        };
       });
 
-      // Set a timeout in case no video is found
-      setTimeout(() => resolve(null), 5000);
-    });
-
-    // Wait for media content to load
-    // await this.page
-    //   .waitForFunction(
-    //     () => {
-    //       const video = document.querySelector("video");
-    //       const images = document.querySelectorAll("img[alt='Image']");
-    //       return video || images.length > 0;
-    //     },
-    //     { timeout: 5000 }
-    //   )
-    //   .catch(() => console.log("No media found or timeout"));
-
-    ///don't forget to add this back //important for video .... keeping
-    // this.page.on("response", async (response) => {
-    //   const url = response.url();
-    //   if (url.includes(".m3u8")) {
-    //     videoUrls.push(url);
-    //   }
-    // });
-    // console.log("videoUrls", videoUrls);
-    // this.page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
-
-    const latestTweet = await this.page.evaluate(() => {
-      const tweetElement = document.querySelector(
-        'article[data-testid="tweet"]'
-      );
-      if (!tweetElement) return null;
-
-      const tweetLink = tweetElement.querySelector('a[href*="/status/"]');
-      const tweetId = tweetLink?.getAttribute("href")?.split("/status/")[1];
-      const textElement = tweetElement.querySelector(
-        'div[data-testid="tweetText"]'
-      );
-      const timeElement = tweetElement.querySelector("time");
-
-      // Check for video content first
-      const videoPlayer = tweetElement.querySelector(
-        'div[data-testid="videoPlayer"]'
-      );
-      const videoElement = tweetElement.querySelector("video");
-      const hasVideo = !!(videoPlayer || videoElement);
-      //   console.log("Has video:", videoElement);
-
-      // Collect media URLs
-      const mediaUrls: string[] = [];
-
-      //restore this //might not be needed
-      // If video exists, get its sources
-      console.log("Has video bool:", hasVideo);
-
-      //     if (hasVideo) {
-      //       // Get video thumbnail
-      //       const videoThumb = tweetElement.querySelector(
-      //         'img[src*="video_thumb"]'
-      //       );
-      //       if (videoThumb?.getAttribute("src")) {
-      //         mediaUrls.push(videoThumb.getAttribute("src")!);
-      //       }
-
-      //       // Get any available video source
-      //       if (videoElement) {
-      //         const sources = videoElement.querySelectorAll("source");
-      //         sources.forEach((source) => {
-      //           const src = source.getAttribute("src");
-      //           if (src) mediaUrls.push(src);
-      //         });
-      //       }
-      //     // } else {
-      //     //   // If no video, collect image URLs
-      //     const images = tweetElement.querySelectorAll("img[alt='Image']");
-      //     images.forEach((img) => {
-      //       const src = img.getAttribute("src");
-      //       if (src) mediaUrls.push(src);
-      //     });
-      //     // }
-
+      // if (videoUrl) {
+      //   tweetData?.mediaUrls.push(videoUrl);
+      //   tweetData.hasVideo = true;
       // }
-      return {
-        text: textElement?.textContent || "",
-        timestamp: timeElement?.getAttribute("datetime") || "",
-        username:
-          tweetElement.querySelector('div[data-testid="User-Name"]')
-            ?.textContent || "",
-        tweetId: tweetId || "",
-        mediaUrls,
-        hasVideo,
-      };
-    });
 
-      if (!latestTweet) {
-        console.log("No tweets found");
-        return null;
+      if (!tweetData) return null;
+
+      if (videoUrl) {
+        tweetData.mediaUrls.push(videoUrl);
+        tweetData.hasVideo = true;
       }
-
-      if (latestTweet.hasVideo) {
-        console.log("Waiting for video URL...");
-        const videoUrl = await videoPromise; // Wait for m3u8 link
-        if (videoUrl) latestTweet.mediaUrls.push(videoUrl);
-      }
-
-      if (videoUrls.length > 0) {
-        latestTweet.mediaUrls.push(...videoUrls);
-      }
-      console.log("mediaUrls", latestTweet.mediaUrls);
-
-      if (this.lastKnownTweetId === latestTweet.tweetId) {
+  
+      if (this.lastKnownTweetId === tweetData.tweetId) {
         console.log("No new tweets since last check");
         return null;
       }
-
-      this.lastKnownTweetId = latestTweet.tweetId;
+  
+      this.lastKnownTweetId = tweetData.tweetId;
       console.log("✅ New tweet found!");
-      return latestTweet;
-    } catch (error) {
+      return tweetData;
+    }catch (error) {
       console.error("Error scraping latest tweet:", error);
       return null;
     }
@@ -178,56 +232,70 @@ export class TwitterScraper {
 
   async monitorLatestTweets(
     username: string,
-    checkInterval: number = 60000
+    checkInterval: number = 60000,
+    onNewTweet?: (tweet: ITweet) => Promise<void>
   ): Promise<void> {
     console.log(`Started monitoring tweets for @${username}`);
     console.log(`Checking every ${checkInterval / 1000} seconds`);
 
+    // Clear any existing interval
+    if (this.monitoringInterval) {
+      clearInterval(this.monitoringInterval);
+    }
+
+    // Initialize with the latest tweet
     await this.getLatestTweet(username);
 
-    setInterval(async () => {
-      const newTweet = await this.getLatestTweet(username);
-      if (newTweet) {
-        console.log("New tweet found:", newTweet);
+    this.monitoringInterval = setInterval(async () => {
+      try {
+        const newTweet = await this.getLatestTweet(username);
+        if (newTweet) {
+          console.log("New tweet found:", newTweet);
 
-        try {
-          await Tweet.create({
-            id: newTweet.tweetId,
-            tweet_text: newTweet.text,
-            author: newTweet.username,
-          });
+          if (onNewTweet) {
+            await onNewTweet(newTweet);
+          } else {
+            // Default behavior if no callback is provided
+            try {
+              await Tweet.create({
+                id: newTweet.tweetId,
+                tweet_text: newTweet.text,
+                author: newTweet.username,
+              });
 
-          if (newTweet.mediaUrls && newTweet.mediaUrls.length > 0) {
-            console.log(`🔗 Saving media for tweet ${newTweet.tweetId}`);
-            // Wait for video player to fully load if it's a video
-            if (newTweet.hasVideo) {
-              console.log("Waiting for video to load...");
-              await this.page
-                .waitForFunction(
-                  () => {
-                    const video = document.querySelector("video");
-                    return video && video.readyState >= 2;
-                  },
-                  { timeout: 5000 }
-                )
-                .catch(() => console.log("Video load timeout"));
+              if (newTweet.mediaUrls.length > 0) {
+                console.log(`🔗 Found media for tweet ${newTweet.tweetId}`);
+                console.log("Media URLs:", newTweet.mediaUrls);
+                
+                // If you want to save media, uncomment and implement saveMedia
+                // await saveMedia(
+                //   this.page,
+                //   newTweet.tweetId,
+                //   newTweet.mediaUrls,
+                //   newTweet.hasVideo
+                // );
+              }
+            } catch (error) {
+              console.error("Error saving tweet or media to database:", error);
             }
-
-            console.log("newTweet.mediaUrls", newTweet.mediaUrls);
-            // await saveMedia(
-            //   this.page,
-            //   newTweet.tweetId,
-            //   newTweet.mediaUrls,
-            //   newTweet.hasVideo
-            // );
           }
-        } catch (error) {
-          console.error("Error saving tweet or media to database:", error);
         }
+      } catch (error) {
+        console.error("Error in monitoring interval:", error);
       }
     }, checkInterval);
   }
+
+  // Add a cleanup method
+  stopMonitoring(): void {
+    if (this.monitoringInterval) {
+      clearInterval(this.monitoringInterval);
+      this.monitoringInterval = null;
+      console.log("Stopped monitoring tweets");
+    }
+  }
 }
+
 
 export const startScraping = async (page: Page, userToTrack: string) => {
   const scraper = new TwitterScraper(page);

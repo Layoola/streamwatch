@@ -25,6 +25,7 @@
     "express": "^4.21.2",
     "fs": "^0.0.1-security",
     "minimist": "^1.2.8",
+    "node-fetch": "^3.3.2",
     "puppeteer": "^24.2.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",

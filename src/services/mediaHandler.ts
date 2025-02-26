@@ -89,7 +89,6 @@ const getVideoUrl = async (page: Page): Promise<string | null> => {
   });
 };
 
-
 //redundant to be removed
 // async function handleBlobUrl(
 //   page: Page,
