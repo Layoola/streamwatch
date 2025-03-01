@@ -1,22 +1,24 @@
 import { Page } from "puppeteer";
 import axios from "axios";
+import { parentPort, workerData } from "worker_threads";
 import { Media } from "../models";
 import * as fs from "fs";
 import * as path from "path";
 import { spawn } from "child_process";
+import { Worker } from "worker_threads";
 import { promises } from "dns";
 import { promisify } from "util";
 
 const MEDIA_DIR = path.join(__dirname, "../../data/media");
 const readFileAsync = promisify(fs.readFile);
 const writeFileAsync = promisify(fs.writeFile);
-const unlinkAsync = promisify(fs.unlink);
+export const unlinkAsync = promisify(fs.unlink);
 
 if (!fs.existsSync(MEDIA_DIR)) {
   fs.mkdirSync(MEDIA_DIR, { recursive: true });
 }
 
-function checkFfmpeg(): Promise<boolean> {
+export function checkFfmpeg(): Promise<boolean> {
   return new Promise((resolve, reject) => {
     const ffmpeg = spawn("ffmpeg", ["-version"]);
     ffmpeg.on("error", () => {
@@ -30,7 +32,7 @@ function checkFfmpeg(): Promise<boolean> {
 }
 
 // Fetch video as Base64 //this needs to be worked on before saving the video as base64
-async function convertM3u8ToBase64(
+export async function convertM3u8ToBase64(
   url: string,
   outputBase64File: string = "outputBase64File.txt"
 ): Promise<{ base64Data: string; tempFile: string }> {
@@ -110,7 +112,6 @@ async function convertM3u8ToBase64(
 }
 
 export const saveMedia = async (
-  page: Page,
   tweetId: string,
   mediaUrls: string[],
   hasVideo: boolean = false
@@ -181,4 +182,29 @@ export const saveMedia = async (
       console.error(`❌ Error saving media for tweet ${tweetId}:`, error);
     }
   }
+};
+
+export const saveMediaWorker = (
+  tweetId: string,
+  mediaUrls: string[],
+  hasVideo = false
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker("./worker/mediaWorker.js", {
+      workerData: { tweetId, mediaUrls, hasVideo },
+    });
+
+    worker.on("message", (msg) => console.log(msg.message));
+
+    worker.on("error", reject);
+    worker.on("exit", (code) => {
+      if (code === 0) {
+        resolve(
+          `✅ Media processing for tweet ${tweetId} completed successfully.`
+        );
+      } else {
+        reject(new Error(`Worker stopped with exit code ${code}`));
+      }
+    });
+  });
 };

@@ -2,8 +2,7 @@ import { Page } from "puppeteer";
 import { Tweet } from "../models";
 // import { saveMedia } from "./mediaHandler";
 import { response } from "express";
-import { saveMedia } from "./mediaHandler";
-import { has } from "cheerio/dist/commonjs/api/traversing";
+import { saveMedia, saveMediaWorker } from "./mediaHandler";
 
 //friendly reminder if it works don't touch it
 
@@ -264,8 +263,8 @@ export class TwitterScraper {
                 console.log("Saving media to database...");
 
                 // If you want to save media, uncomment and implement saveMedia
-                await saveMedia(
-                  this.page,
+
+                await saveMediaWorker(
                   newTweet.tweetId,
                   newTweet.mediaUrls,
                   newTweet.hasVideo
@@ -291,7 +290,6 @@ export class TwitterScraper {
     }
   }
 }
-
 
 export const startScraping = async (page: Page, userToTrack: string) => {
   const scraper = new TwitterScraper(page);
