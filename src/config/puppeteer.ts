@@ -8,6 +8,7 @@ let browser: any = null;
 let page: any = null;
 
 const USER_DATA_DIR = "./user_data";
+const isSessionAvailable = fs.existsSync(USER_DATA_DIR);
 
 const twitter = {
   initialize: async () => {
@@ -24,8 +25,6 @@ const twitter = {
     await new Promise((r) => setTimeout(r, 2000));
   },
   login: async (username: string, password: string) => {
-    const isSessionAvailable = fs.existsSync(USER_DATA_DIR);
-
     if (isSessionAvailable) {
       console.log("🔄 Using existing session, skipping login.");
       return { browser, page };
