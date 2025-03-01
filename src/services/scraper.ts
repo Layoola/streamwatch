@@ -119,16 +119,6 @@ export class TwitterScraper {
       return imageUrls;
     });
 
-    // const hasVideo = await this.page.evaluate(() => {
-    //   const tweetElement = document.querySelector(
-    //     'article[data-testid="tweet"]'
-    //   );
-    //   return !!(
-    //     tweetElement?.querySelector('div[data-testid="videoPlayer"]') ||
-    //     tweetElement?.querySelector("video")
-    //   );
-    // });
-
     return { imageUrls: imageUrlsInTweet };
   }
 
@@ -157,6 +147,8 @@ export class TwitterScraper {
 
         let mediaUrls: string[] = [];
 
+        //edit engagements: Likes, retweets, comments to be the values of the tweet
+
         return {
           text: textElement?.textContent || "",
           timestamp: timeElement?.getAttribute("datetime") || "",
@@ -165,6 +157,9 @@ export class TwitterScraper {
               ?.textContent || "",
           tweetId: tweetId || "",
           mediaUrls: mediaUrls,
+          likes: 0,
+          retweets: 0,
+          comments: 0,
           hasVideo: false,
         };
       });
@@ -262,7 +257,6 @@ export class TwitterScraper {
 
                 console.log("Saving media to database...");
 
-                // If you want to save media, uncomment and implement saveMedia
 
                 await saveMediaWorker(
                   newTweet.tweetId,
