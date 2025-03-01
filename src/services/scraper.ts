@@ -12,6 +12,9 @@ interface ITweet {
   timestamp: string;
   tweetId: string;
   mediaUrls: string[];
+  likes: number;
+  retweets: number;
+  comments: number;
   hasVideo: boolean;
 }
 
@@ -249,6 +252,9 @@ export class TwitterScraper {
                 id: newTweet.tweetId,
                 tweet_text: newTweet.text,
                 author: newTweet.username,
+                likes: newTweet.likes,
+                retweets: newTweet.retweets,
+                comments: newTweet.comments,
               });
 
               if (newTweet.mediaUrls.length > 0) {
@@ -256,7 +262,6 @@ export class TwitterScraper {
                 console.log("Media URLs:", newTweet.mediaUrls);
 
                 console.log("Saving media to database...");
-
 
                 await saveMediaWorker(
                   newTweet.tweetId,
