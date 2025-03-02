@@ -3,6 +3,7 @@ import { Tweet } from "../models";
 // import { saveMedia } from "./mediaHandler";
 import { response } from "express";
 import { saveMedia, saveMediaWorker } from "./mediaHandler";
+import logger from "../logging/logger";
 
 //friendly reminder if it works don't touch it
 
@@ -98,7 +99,7 @@ export class TwitterScraper {
 
       return null;
     } catch (error) {
-      console.error("Error getting video URL from tweet ID:", error);
+      logger.error("Error getting video URL from tweet ID:", error);
       return null;
     }
   }
@@ -216,7 +217,7 @@ export class TwitterScraper {
       console.log("✅ New tweet found!");
       return tweetData;
     } catch (error) {
-      console.error("Error scraping latest tweet:", error);
+      logger.error("Error scraping latest tweet:", error);
       return null;
     }
   }
@@ -270,12 +271,12 @@ export class TwitterScraper {
                 );
               }
             } catch (error) {
-              console.error("Error saving tweet or media to database:", error);
+              logger.error("Error saving tweet or media to database:", error);
             }
           }
         }
       } catch (error) {
-        console.error("Error in monitoring interval:", error);
+        logger.error("Error in monitoring interval:", error);
       }
     }, checkInterval);
   }

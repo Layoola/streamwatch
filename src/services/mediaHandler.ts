@@ -1,13 +1,13 @@
-import { Page } from "puppeteer";
 import axios from "axios";
-import { parentPort, workerData } from "worker_threads";
+
 import { Media } from "../models";
 import * as fs from "fs";
 import * as path from "path";
 import { spawn } from "child_process";
 import { Worker } from "worker_threads";
-import { promises } from "dns";
+
 import { promisify } from "util";
+import logger from "../logging/logger";
 
 const MEDIA_DIR = path.join(__dirname, "../../data/media");
 const readFileAsync = promisify(fs.readFile);
@@ -22,7 +22,7 @@ export function checkFfmpeg(): Promise<boolean> {
   return new Promise((resolve, reject) => {
     const ffmpeg = spawn("ffmpeg", ["-version"]);
     ffmpeg.on("error", () => {
-      console.error("❌ FFmpeg not found in PATH. Please install FFmpeg.");
+      logger.error("❌ FFmpeg not found in PATH. Please install FFmpeg.");
       resolve(false);
     });
     ffmpeg.on("close", (code) => {
@@ -62,7 +62,7 @@ export async function convertM3u8ToBase64(
           process.stdout.write(`\r${progressLine}`);
         } else if (!output.includes("Press [q] to stop")) {
           // Filter out common noisy messages
-          console.error(output);
+          logger.error(output);
         }
       });
 
@@ -71,13 +71,13 @@ export async function convertM3u8ToBase64(
           console.log(`\nVideo downloaded to temporary file.`);
           resolve();
         } else {
-          console.error(`\nError downloading video. Exit code: ${code}`);
+          logger.error(`\nError downloading video. Exit code: ${code}`);
           reject(new Error("FFMPEG process failed"));
         }
       });
 
       ffmpeg.on("error", (err) => {
-        console.error(`Error spawning ffmpeg process: ${err.message}`);
+        logger.error(`Error spawning ffmpeg process: ${err.message}`);
         reject(err);
       });
     });
@@ -159,7 +159,7 @@ export const saveMedia = async (
         // Check for FFmpeg
         const ffmpegAvailable = await checkFfmpeg();
         if (!ffmpegAvailable) {
-          console.error("❌ Skipping video download. FFmpeg not found.");
+          logger.error("❌ Skipping video download. FFmpeg not found.");
           continue;
         }
 
@@ -179,7 +179,7 @@ export const saveMedia = async (
         console.log(`✅ Saved video for tweet ${tweetId}`);
       }
     } catch (error) {
-      console.error(`❌ Error saving media for tweet ${tweetId}:`, error);
+      logger.error(`❌ Error saving media for tweet ${tweetId}:`, error);
     }
   }
 };

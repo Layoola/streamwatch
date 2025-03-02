@@ -1,4 +1,5 @@
 import sequelize from "../src/config/database";
+import logger from "../src/logging/logger";
 import { Tweet, Media, Action } from "../src/models";
 
 const testDb = async () => {
@@ -16,7 +17,7 @@ const testDb = async () => {
 
     //media creation test
     const media = await Media.create({
-      tweet_id: tweet.id, //some tweet id
+      tweet_id: "test-id", //some tweet id
       file_path: "/path/to/file",
       media_type: "image",
     });
@@ -24,25 +25,29 @@ const testDb = async () => {
 
     //add action test
     const action = await Action.create({
-        action_type: "like",
-        related_tweet_id: tweet.id, //some tweet id
-    })
+      action_type: "like",
+      related_tweet_id: "test-id", //some tweet id
+    });
     console.log("✅ Action Recorded:", action.toJSON());
     const tweets = await Tweet.findAll({
-        include: [Media, Action], // Include related models
-      });
-  
-      console.log("🔍 Retrieved Tweets with Relations:", JSON.stringify(tweets, null, 2));
-  
-      console.log("🎉 Database test completed successfully!");
-    } catch (error) {
-      console.error("❌ Database test failed:", error);
+      include: [Media, Action], // Include related models
+    });
+
+    console.log(
+      "🔍 Retrieved Tweets with Relations:",
+      JSON.stringify(tweets, null, 2)
+    );
+
+    console.log("🎉 Database test completed successfully!");
+  } catch (error) {
+    logger.error("❌ Database test failed:", error);
   } finally {
-    await sequelize.close().then(() => console.log("Database connection closed.")).catch(() => console.error("Failed to close database connection."));
+    await sequelize
+      .close()
+      .then(() => console.log("Database connection closed."))
+      .catch(() => logger.error("Failed to close database connection."));
     process.exit(0);
   }
 };
-
-
 
 testDb();

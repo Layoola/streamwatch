@@ -147,9 +147,9 @@ const minimist = require("minimist");
 //   await twitter.login(username, password);
 // })();
 
-
-import twitter from './config/puppeteer';
-import { startScraping } from './services/scraper';
+import twitter from "./config/puppeteer";
+import logger from "./logging/logger";
+import { startScraping } from "./services/scraper";
 import initializeDatabase from "./setup";
 import * as readline from "readline";
 
@@ -162,7 +162,7 @@ import * as readline from "readline";
   const password = args.password || args.p;
 
   if (!username || !password) {
-    console.error(
+    logger.error(
       "Usage: node script.js --username=<your_username> --password=<your_password>"
     );
     // process.exit(1);
@@ -175,7 +175,7 @@ import * as readline from "readline";
   rl.question("Enter the Twitter userToTrack to monitor: ", async (input) => {
     const userToTrack = input.trim();
     if (!userToTrack) {
-      console.log("❌ userToTrack cannot be empty.");
+      logger.error("❌ userToTrack cannot be empty.");
       // process.exit(1);
     }
 

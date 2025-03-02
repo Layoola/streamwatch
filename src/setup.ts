@@ -1,4 +1,5 @@
 import sequelize from "./config/database";
+import logger from "./logging/logger";
 
 // Function to initialize database
 const initializeDatabase = async () => {
@@ -9,8 +10,8 @@ const initializeDatabase = async () => {
     // await sequelize.sync();
     console.log("Database synced successfully.");
   } catch (error) {
-    console.error("Database initialization failed:", error);
-    process.exit(1); 
+    logger.error("Database initialization failed:", error);
+    process.exit(1);
   }
 };
 

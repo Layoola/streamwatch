@@ -1,4 +1,5 @@
 import twitter from "../config/puppeteer";
+import logger from "../logging/logger";
 const minimist = require("minimist");
 
 export const loginToTwitter = async () => {
@@ -7,7 +8,7 @@ export const loginToTwitter = async () => {
   const password = args.password || args.p;
 
   if (!username || !password) {
-    console.error(
+    logger.error(
       "Usage: node script.js --username=<your_username> --password=<your_password>"
     );
     process.exit(1);

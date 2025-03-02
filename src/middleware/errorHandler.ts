@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from "express";
+import logger from "../logging/logger";
 
 class AppError extends Error {
   statusCode: number;
-  
+
   constructor(message: string, statusCode: number = 500) {
     super(message);
     this.statusCode = statusCode;
@@ -11,9 +12,14 @@ class AppError extends Error {
 }
 
 // Global error handling middleware
-const errorHandler = (err: AppError, req: Request, res: Response, next: NextFunction) => {
-  console.error("Error:", err.message);
-  
+const errorHandler = (
+  err: AppError,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  logger.error("Error:", err.message);
+
   res.status(err.statusCode || 500).json({
     success: false,
     message: err.message || "Internal Server Error",

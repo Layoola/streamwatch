@@ -1,6 +1,6 @@
 import { parentPort, workerData } from "worker_threads";
 import axios from "axios";
-import { Media } from "../../models"; // Adjust import as needed
+import { Media } from "../../models"; 
 //import { checkFfmpeg, convertM3u8ToBase64, unlinkAsync } from "./ffmpegUtils"; // Adjust import as needed
 import { checkFfmpeg, convertM3u8ToBase64, unlinkAsync } from "../mediaHandler";
 
