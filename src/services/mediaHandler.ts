@@ -111,6 +111,30 @@ export async function convertM3u8ToBase64(
   }
 }
 
+export function convertM3u8ToBase64Worker(
+  url: string,
+  outputBase64File: string = "outputBase64File.txt"
+): Promise<{ base64Data: string; tempFile: string }> {
+  return new Promise((resolve, reject) => {
+    const workerPath = path.join(__dirname, "worker", "m3u8Worker.mjs");
+
+    const worker = new Worker(workerPath, {
+      workerData: { url, outputBase64File },
+    });
+
+    worker.on("message", (data) => {
+      if (data.error) {
+        reject(new Error(data.error));
+      } else {
+        resolve(data);
+      }
+      worker.terminate();
+    });
+
+    worker.on("error", reject);
+  });
+}
+
 export const saveMedia = async (
   tweetId: string,
   mediaUrls: string[],
@@ -164,7 +188,8 @@ export const saveMedia = async (
         }
 
         // Convert M3U8 to Base64
-        const { base64Data, tempFile } = await convertM3u8ToBase64(mediaUrl);
+        const { base64Data, tempFile } =
+          await convertM3u8ToBase64Worker(mediaUrl);
 
         // Save to database
         await Media.create({
