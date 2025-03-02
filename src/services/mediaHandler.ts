@@ -184,13 +184,15 @@ export const saveMedia = async (
   }
 };
 
+//home/psyxh/projects/stream-watch/src/services/worker/mediaWorker.mjs
+
 export const saveMediaWorker = (
   tweetId: string,
   mediaUrls: string[],
   hasVideo = false
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const worker = new Worker("./worker/mediaWorker.js", {
+    const worker = new Worker("./src/services/worker/mediaWorker.mjs", {
       workerData: { tweetId, mediaUrls, hasVideo },
     });
 

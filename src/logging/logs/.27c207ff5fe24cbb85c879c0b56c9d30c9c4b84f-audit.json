@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/home/psyxh/projects/stream-watch/src/logging/logs/.27c207ff5fe24cbb85c879c0b56c9d30c9c4b84f-audit.json",
+    "files": [
+        {
+            "date": 1740878367354,
+            "name": "/home/psyxh/projects/stream-watch/src/logging/logs/app-2025-03-02.log",
+            "hash": "3913533b1946cdcb097fd4f82029cc0750e3995049546d8776871d8f3d5dba5e"
+        }
+    ],
+    "hashType": "sha256"
+}

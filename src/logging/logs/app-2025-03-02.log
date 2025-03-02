@@ -1,0 +1,41 @@
+2025-03-02T01:19:28.366Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T01:35:08.998Z [ERROR]: Error saving tweet or media to database: Cannot find module '/home/psyxh/projects/stream-watch/worker/mediaWorker.js'
+2025-03-02T02:50:39.867Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T02:51:45.779Z [ERROR]: Error saving tweet or media to database: Cannot find module '/home/psyxh/projects/stream-watch/worker/services/mediaWorker.js'
+2025-03-02T02:52:15.801Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T02:54:20.375Z [ERROR]: Error saving tweet or media to database: Cannot find module '/home/psyxh/projects/stream-watch/worker/services/worker/mediaWorker.js'
+2025-03-02T02:59:19.219Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T03:00:23.869Z [ERROR]: Error saving tweet or media to database: Directory import '/home/psyxh/projects/stream-watch/src/models' is not supported resolving ES modules imported from /home/psyxh/projects/stream-watch/src/services/worker/mediaWorker.js
+2025-03-02T07:03:50.679Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T07:05:20.162Z [ERROR]: Error saving tweet or media to database: Cannot find module '/home/psyxh/projects/stream-watch/src/services/mediaHandler' imported from /home/psyxh/projects/stream-watch/src/services/worker/mediaWorker.js
+2025-03-02T07:09:59.617Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T07:13:41.226Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T07:14:24.435Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T07:14:54.258Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T07:15:24.278Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T07:15:28.309Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T07:15:58.321Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T11:08:26.136Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T11:08:59.104Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T11:09:20.745Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T11:09:33.074Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T11:10:03.068Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T11:10:33.067Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T11:11:29.112Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T11:11:59.117Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T11:35:29.007Z [ERROR]: Error saving tweet or media to database: Unknown file extension ".ts" for /home/psyxh/projects/stream-watch/src/services/mediaHandler.ts
+2025-03-02T12:21:05.181Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T12:22:25.757Z [ERROR]: Error saving tweet or media to database: Unknown file extension ".ts" for /home/psyxh/projects/stream-watch/src/services/mediaHandler.ts
+2025-03-02T12:23:24.766Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T12:54:07.058Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T12:56:10.669Z [ERROR]: Error saving tweet or media to database: Cannot find module '/home/psyxh/projects/stream-watch/src/services/worker/mediaWorker.js'
+2025-03-02T12:58:15.677Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T13:12:15.677Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T13:14:55.083Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T13:21:49.274Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T13:25:36.943Z [ERROR]: Error saving tweet or media to database: Cannot find module '/home/psyxh/projects/stream-watch/worker/mediaWorker.mjs'
+2025-03-02T13:29:15.960Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T13:30:23.703Z [ERROR]: Error saving tweet or media to database: Directory import '/home/psyxh/projects/stream-watch/src/models' is not supported resolving ES modules imported from /home/psyxh/projects/stream-watch/src/services/worker/mediaWorker.mjs
+2025-03-02T13:43:46.974Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T13:47:17.357Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T13:50:31.010Z [ERROR]: Error saving tweet or media to database: Directory import '/home/psyxh/projects/stream-watch/src/models' is not supported resolving ES modules imported from /home/psyxh/projects/stream-watch/src/services/worker/mediaWorker.mjs
