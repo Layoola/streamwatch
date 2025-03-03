@@ -9,6 +9,11 @@
             "date": 1740878367354,
             "name": "/home/psyxh/projects/stream-watch/src/logging/logs/app-2025-03-02.log",
             "hash": "3913533b1946cdcb097fd4f82029cc0750e3995049546d8776871d8f3d5dba5e"
+        },
+        {
+            "date": 1741005808903,
+            "name": "/home/psyxh/projects/stream-watch/src/logging/logs/app-2025-03-03.log",
+            "hash": "0182c0455698b33c4304f8b6de43c40555dc1ea4166f2bb3e6b9e50b3037904e"
         }
     ],
     "hashType": "sha256"

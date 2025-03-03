@@ -39,3 +39,49 @@
 2025-03-02T13:43:46.974Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
 2025-03-02T13:47:17.357Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
 2025-03-02T13:50:31.010Z [ERROR]: Error saving tweet or media to database: Directory import '/home/psyxh/projects/stream-watch/src/models' is not supported resolving ES modules imported from /home/psyxh/projects/stream-watch/src/services/worker/mediaWorker.mjs
+2025-03-02T15:09:13.865Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T15:10:55.002Z [ERROR]: Error scraping latest tweet: Waiting for selector `article[data-testid="tweet"]` failed: Waiting failed: 30000ms exceeded
+2025-03-02T15:28:49.381Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T15:38:29.824Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T15:39:41.967Z [ERROR]: ❌ Error saving media for tweet 1896216236075467107:
+2025-03-02T15:40:59.116Z [ERROR]: Error scraping latest tweet: Waiting for selector `article[data-testid="tweet"]` failed: Waiting failed: 30000ms exceeded
+2025-03-02T15:42:03.146Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T15:44:35.860Z [ERROR]: Error scraping latest tweet: Waiting for selector `article[data-testid="tweet"]` failed: Waiting failed: 30000ms exceeded
+2025-03-02T15:45:05.162Z [ERROR]: Error scraping latest tweet: Waiting for selector `article[data-testid="tweet"]` failed: Waiting failed: 30000ms exceeded
+2025-03-02T15:45:38.165Z [ERROR]: Error scraping latest tweet: Waiting for selector `article[data-testid="tweet"]` failed: Waiting failed: 30000ms exceeded
+2025-03-02T15:46:08.066Z [ERROR]: Error scraping latest tweet: Waiting for selector `article[data-testid="tweet"]` failed: Waiting failed: 30000ms exceeded
+2025-03-02T15:49:01.008Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T15:51:31.449Z [ERROR]: Error scraping latest tweet: Waiting for selector `article[data-testid="tweet"]` failed: Waiting failed: 30000ms exceeded
+2025-03-02T15:53:04.753Z [ERROR]: Error scraping latest tweet: Waiting for selector `article[data-testid="tweet"]` failed: Waiting failed: 30000ms exceeded
+2025-03-02T15:54:06.035Z [ERROR]: Error scraping latest tweet: Waiting for selector `article[data-testid="tweet"]` failed: Waiting failed: 30000ms exceeded
+2025-03-02T15:57:26.144Z [ERROR]: Error scraping latest tweet: net::ERR_ADDRESS_UNREACHABLE at https://twitter.com/olur0cks
+2025-03-02T15:58:08.647Z [ERROR]: Error scraping latest tweet: Navigation timeout of 30000 ms exceeded
+2025-03-02T15:59:49.190Z [ERROR]: Error scraping latest tweet: Execution context was destroyed, most likely because of a navigation.
+2025-03-02T15:59:49.194Z [ERROR]: Error scraping latest tweet: Execution context was destroyed, most likely because of a navigation.
+2025-03-02T15:59:49.199Z [ERROR]: Error scraping latest tweet: Execution context was destroyed, most likely because of a navigation.
+2025-03-02T15:59:49.207Z [ERROR]: Error scraping latest tweet: Execution context was destroyed, most likely because of a navigation.
+2025-03-02T16:00:31.577Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T16:01:01.591Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T16:01:31.593Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T16:02:01.595Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T16:02:31.594Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T16:03:01.616Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T16:03:31.592Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T16:04:01.614Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T16:04:31.617Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T16:05:01.643Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T16:05:31.631Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T16:06:01.629Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-02T18:34:26.292Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T18:57:11.098Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T19:30:34.163Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T19:48:06.268Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T20:03:36.708Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T20:13:02.679Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T20:16:15.857Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T20:54:55.154Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T20:56:46.966Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T21:11:05.638Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T21:17:19.162Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-02T21:18:50.386Z [ERROR]: Error scraping latest tweet: net::ERR_TOO_MANY_REDIRECTS at https://twitter.com/olur0cks
+2025-03-02T21:26:45.575Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>

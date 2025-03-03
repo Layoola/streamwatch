@@ -2,13 +2,25 @@ import { DataTypes, Model } from "sequelize";
 
 import sequelize from "../config/database";
 
-const Tweet = sequelize.define(
+interface ITweetAttributes {
+  id: string;
+  tweet_text: string;
+  author: string;
+  likes: number;
+  retweets: number;
+  comments: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+interface ITweetInstance extends Model<ITweetAttributes>, ITweetAttributes {}
+
+const Tweet = sequelize.define<ITweetInstance>(
   "Tweet",
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       primaryKey: true,
-      autoIncrement: true,
     },
     tweet_text: {
       type: DataTypes.STRING,

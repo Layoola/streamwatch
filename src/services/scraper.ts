@@ -65,11 +65,12 @@ export class TwitterScraper {
 
   async getVideoUrlFromTweetId(tweetId: string): Promise<string | null> {
     try {
+      this.setupVideoInterception();
+
       await this.page.goto(`https://twitter.com/i/web/status/${tweetId}`, {
         waitUntil: "networkidle2",
       });
 
-      this.setupVideoInterception();
 
       await this.page.evaluate(() => {
         const videoPlayer = document.querySelector(
@@ -87,7 +88,7 @@ export class TwitterScraper {
           );
           return videoExists;
         },
-        3000,
+        30000,
         500
       );
 
@@ -129,7 +130,6 @@ export class TwitterScraper {
   //getting the latest tweet by a user
   async getLatestTweet(username: string): Promise<ITweet | null> {
     try {
-      // this.setupVideoInterception();
       await this.page.evaluate(() => {
         window.scrollTo(0, 0);
       });
@@ -149,9 +149,42 @@ export class TwitterScraper {
         );
         const timeElement = tweetElement.querySelector("time");
 
-        let mediaUrls: string[] = [];
+        // Extract likes
+        // Try these alternative selectors
+        const likesElement = tweetElement.querySelector(
+          'div[data-testid="like"] span[data-testid="app-text-transition-container"]'
+        );
+        const likes = likesElement
+          ? parseInt(likesElement.textContent?.replace(/,/g, "") || "0", 10)
+          : 0;
 
-        //edit engagements: Likes, retweets, comments to be the values of the tweet
+        // Similar updates for retweets and comments
+
+        // Extract retweets
+        const retweetsElement = tweetElement.querySelector(
+          'div[data-testid="retweet"]'
+        );
+        const retweets = retweetsElement
+          ? parseInt(
+              retweetsElement.getAttribute("aria-label")?.replace(/,/g, "") ||
+                "0",
+              10
+            )
+          : 0;
+
+        // Extract comments (replies)
+        const commentsElement = tweetElement.querySelector(
+          'div[data-testid="reply"]'
+        );
+        const comments = commentsElement
+          ? parseInt(
+              commentsElement.getAttribute("aria-label")?.replace(/,/g, "") ||
+                "0",
+              10
+            )
+          : 0;
+
+        let mediaUrls: string[] = [];
 
         return {
           text: textElement?.textContent || "",
@@ -161,9 +194,9 @@ export class TwitterScraper {
               ?.textContent || "",
           tweetId: tweetId || "",
           mediaUrls: mediaUrls,
-          likes: 0,
-          retweets: 0,
-          comments: 0,
+          likes: likes, // Added likes
+          retweets: retweets, // Added retweets
+          comments: comments, // Added comments
           hasVideo: false,
         };
       });
@@ -188,7 +221,7 @@ export class TwitterScraper {
         );
       });
 
-      tweetData.hasVideo = hasVideo; // This line is missing
+      tweetData.hasVideo = hasVideo;
 
       const { imageUrls } = await this.extractImageUrlsFromTweet();
       imageUrls.forEach((url) => tweetData.mediaUrls.push(url));
@@ -197,9 +230,7 @@ export class TwitterScraper {
 
       if (hasVideo) {
         console.log("⏳ Video detected, waiting for video URL to load...");
-        // this.setupVideoInterception();
-        console.log(tweetData.tweetId);
-        const videoUrl = await this.getVideoUrlFromTweetId(tweetData.tweetId);
+        videoUrl = await this.getVideoUrlFromTweetId(tweetData.tweetId);
         if (videoUrl) {
           console.log("📹 Video URL found:", videoUrl);
           tweetData.mediaUrls.push(videoUrl);
@@ -264,7 +295,7 @@ export class TwitterScraper {
 
                 console.log("Saving media to database...");
 
-                await saveMediaWorker(
+                await saveMedia(
                   newTweet.tweetId,
                   newTweet.mediaUrls,
                   newTweet.hasVideo

@@ -10,7 +10,7 @@ const Media = sequelize.define(
       autoIncrement: true,
     },
     tweet_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
       references: {
         model: "tweets",

@@ -116,7 +116,7 @@ export function convertM3u8ToBase64Worker(
   outputBase64File: string = "outputBase64File.txt"
 ): Promise<{ base64Data: string; tempFile: string }> {
   return new Promise((resolve, reject) => {
-    const workerPath = path.join(__dirname, "worker", "m3u8Worker.mjs");
+    const workerPath = path.join(__dirname, "worker", "mediaWorker.mjs");
 
     const worker = new Worker(workerPath, {
       workerData: { url, outputBase64File },
@@ -158,11 +158,14 @@ export const saveMedia = async (
 
       const urlParts = mediaUrl.split("?")[0]; // Remove query parameters
       const fileExtension = urlParts.split(".").pop()?.toLowerCase() || "";
+      const mediaType =
+        new URL(mediaUrl).searchParams.get("format")?.toLowerCase() || "";
 
       console.log("fileExtension", fileExtension);
+      console.log("mediaType", mediaType);
 
       // Handle images
-      if (["jpg", "jpeg", "png", "gif"].includes(fileExtension)) {
+      if (["jpg", "jpeg", "png", "gif"].includes(mediaType)) {
         const response = await axios.get(mediaUrl, {
           responseType: "arraybuffer",
           timeout: 10000, // 10 second timeout
@@ -188,8 +191,9 @@ export const saveMedia = async (
         }
 
         // Convert M3U8 to Base64
-        const { base64Data, tempFile } =
-          await convertM3u8ToBase64Worker(mediaUrl);
+        const { base64Data, tempFile } = await convertM3u8ToBase64Worker(
+          mediaUrl
+        );
 
         // Save to database
         await Media.create({
@@ -204,7 +208,7 @@ export const saveMedia = async (
         console.log(`✅ Saved video for tweet ${tweetId}`);
       }
     } catch (error) {
-      logger.error(`❌ Error saving media for tweet ${tweetId}:`, error);
+      console.error(`❌ Error saving media for tweet ${tweetId}:`, error);
     }
   }
 };
