@@ -32,7 +32,7 @@ import * as readline from "readline";
       // process.exit(1);
     }
 
-    await twitter.initialize();
+    await twitter.initialize(username);
     const result = await twitter.login(username, password);
 
     if (result) {

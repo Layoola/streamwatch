@@ -12,3 +12,5 @@
 2025-03-04T18:02:07.807Z [ERROR]: Error getting video URL from tweet ID: Navigation timeout of 30000 ms exceeded
 2025-03-04T18:02:42.932Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
 2025-03-04T18:03:32.964Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-04T19:32:17.745Z [ERROR]: Error scraping latest tweet: Waiting for selector `article[data-testid="tweet"]` failed: Waiting failed: 30000ms exceeded
+2025-03-04T19:34:29.660Z [ERROR]: Error scraping latest tweet: Waiting for selector `article[data-testid="tweet"]` failed: Waiting failed: 30000ms exceeded
