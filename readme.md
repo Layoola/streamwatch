@@ -125,23 +125,6 @@ Comprehensive logging provided in:
 - Console output
 - `src/logs/`
 
-Log levels:
-- INFO: Standard operations
-- WARN: Potential issues
-- ERROR: Critical failures
-
-## 🤝 Contributing
-
-1. Fork the Repository
-2. Create Feature Branch
-3. Commit Changes
-4. Push to Branch
-5. Open Pull Request
-
-### Development Guidelines
-- Follow TypeScript best practices
-- Write unit tests
-- Maintain code readability
 
 ## ⚖️ Legal & Ethics
 
@@ -149,18 +132,6 @@ Log levels:
 - Respect user privacy
 - Use responsibly
 
-## 📜 License
-
-MIT License
-
-## 🙌 Acknowledgements
-
-Inspired by advanced web scraping techniques and the need for comprehensive social media analysis.
-
-## 📞 Support
-
-Open an issue on GitHub for bugs or feature requests.
-
----
+------------
 
 **Disclaimer**: This tool is for research and educational purposes. Always respect platform guidelines and user privacy.
