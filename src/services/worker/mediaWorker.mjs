@@ -1,8 +1,12 @@
+import { parentPort, workerData } from "worker_threads";
 import path from "path";
+import { spawn } from "child_process";
+import { readFile, unlink, writeFile } from "fs/promises";
 
 async function convertM3u8ToBase64(url, outputBase64File) {
-  const tempFile = `temp_${Date.now()}.mp4`;
-  const outBase64File = `outputBase64_${Date.now()}.txt`;
+  const __dirname = path.resolve(path.dirname(""));
+  const tempFile = path.join(__dirname, `temp_${Date.now()}.mp4`);
+  const outBase64File = path.join(__dirname, `outputBase64_${Date.now()}.txt`);
 
   try {
     await new Promise((resolve, reject) => {
@@ -41,13 +45,16 @@ async function convertM3u8ToBase64(url, outputBase64File) {
       ffmpeg.on("error", reject);
     });
 
-    // Correct file deletion using `path.join`
-    await unlink(path.join(__dirname, tempFile));
-    await unlink(path.join(__dirname, outBase64File));
-
+    // await unlink(tempFile);
+    await unlink(outBase64File);
   } catch (error) {
     parentPort?.postMessage({ error: error.message });
   }
 }
 
-convertM3u8ToBase64(workerData.url, workerData.outputBase64File);
+// Ensure workerData is available before calling the function
+if (workerData) {
+  convertM3u8ToBase64(workerData.url, workerData.outputBase64File);
+} else {
+  parentPort?.postMessage({ error: "workerData is undefined" });
+}
