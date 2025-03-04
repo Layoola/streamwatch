@@ -1,7 +1,6 @@
 .env
 node_modules
-src/data/*
 media/*
 user_data
 src/..data/*
-src/..data/database.sqlite
+*.sqlite
