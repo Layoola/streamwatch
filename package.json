@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/app.js",
-    "dev": "npx ts-node src/stream.ts"
+    "dev": "npx ts-node src/stream.ts",
+    "stream": "npx ts-node src/stream.ts"
   },
   "keywords": [],
   "author": "",

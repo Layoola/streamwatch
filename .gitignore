@@ -4,3 +4,4 @@ media/*
 user_data
 src/..data/*
 *.sqlite
+src/logging/logs/*

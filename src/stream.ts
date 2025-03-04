@@ -4,41 +4,45 @@ import twitter from "./config/puppeteer";
 import logger from "./logging/logger";
 import { startScraping } from "./services/scraper";
 import initializeDatabase from "./setup";
-import * as readline from "readline";
 
 (async () => {
   console.log("🚀 Starting database initialization...");
   await initializeDatabase();
   console.log("✅ Database initialized successfully!");
+
+  // Handle both minimist-style and direct argument passing
   const args = minimist(process.argv.slice(2));
-  const username = args.username || args.u;
-  const password = args.password || args.p;
 
-  if (!username || !password) {
+  // Priority: Named arguments > Positional arguments
+  const username = args.username || args.u || process.argv[2];
+  const password = args.password || args.p || process.argv[3];
+  const userToTrack = args.account || args.a || process.argv[4];
+
+  if (!username || !password || !userToTrack) {
     logger.error(
-      "Usage: node script.js --username=<your_username> --password=<your_password>"
+      "Usage: node script.js --username=<your_username> --password=<your_password> --account=<account_to_track>"
     );
-    // process.exit(1);
+    logger.error(
+      "Alternatively: node script.js <username> <password> <account_to_track>"
+    );
+    process.exit(1);
   }
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  console.log("🚀 Starting Twitter scraper...");
-  rl.question("Enter the Twitter userToTrack to monitor: ", async (input) => {
-    const userToTrack = input.trim();
-    if (!userToTrack) {
-      logger.error("❌ userToTrack cannot be empty.");
-      // process.exit(1);
-    }
 
+  console.log("🚀 Starting Twitter scraper...");
+
+  try {
     await twitter.initialize(username);
     const result = await twitter.login(username, password);
 
     if (result) {
       const { page } = result;
       await startScraping(page, userToTrack);
-      rl.close();
+    } else {
+      logger.error("❌ Login failed.");
+      process.exit(1);
     }
-  });
+  } catch (error) {
+    logger.error("❌ An error occurred during scraping:", error);
+    process.exit(1);
+  }
 })();
