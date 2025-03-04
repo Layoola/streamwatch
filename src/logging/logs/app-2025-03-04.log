@@ -8,3 +8,7 @@
 2025-03-04T10:07:32.136Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
 2025-03-04T10:21:20.164Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
 2025-03-04T10:24:05.894Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-04T17:47:56.319Z [ERROR]: Usage: node script.js --username=<your_username> --password=<your_password>
+2025-03-04T18:02:07.807Z [ERROR]: Error getting video URL from tweet ID: Navigation timeout of 30000 ms exceeded
+2025-03-04T18:02:42.932Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks
+2025-03-04T18:03:32.964Z [ERROR]: Error scraping latest tweet: net::ERR_NAME_NOT_RESOLVED at https://twitter.com/olur0cks

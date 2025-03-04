@@ -1,17 +1,9 @@
 import { DataTypes, Model } from "sequelize";
 
 import sequelize from "../config/database";
+import { ITweetAttributes } from "../utils/interfaces";
 
-interface ITweetAttributes {
-  id: string;
-  tweet_text: string;
-  author: string;
-  likes: number;
-  retweets: number;
-  comments: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+
 
 interface ITweetInstance extends Model<ITweetAttributes>, ITweetAttributes {}
 

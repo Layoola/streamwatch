@@ -4,20 +4,9 @@ import { Tweet } from "../models";
 import { response } from "express";
 import { saveMedia, saveMediaWorker } from "./mediaHandler";
 import logger from "../logging/logger";
-
+import { frequency } from "../utils/constants";
+import { ITweet } from "../utils/interfaces";
 //friendly reminder if it works don't touch it
-
-interface ITweet {
-  text: string;
-  username: string;
-  timestamp: string;
-  tweetId: string;
-  mediaUrls: string[];
-  likes: number;
-  retweets: number;
-  comments: number;
-  hasVideo: boolean;
-}
 
 export class TwitterScraper {
   private page: Page;
@@ -71,7 +60,6 @@ export class TwitterScraper {
         waitUntil: "networkidle2",
       });
 
-
       await this.page.evaluate(() => {
         const videoPlayer = document.querySelector(
           'div[data-testid="videoPlayer"]'
@@ -105,7 +93,6 @@ export class TwitterScraper {
     }
   }
 
-  //possibly edit to extract only images from tweet
   private async extractImageUrlsFromTweet(): Promise<{
     imageUrls: string[];
   }> {
@@ -149,16 +136,13 @@ export class TwitterScraper {
         );
         const timeElement = tweetElement.querySelector("time");
 
-        // Extract likes
-        // Try these alternative selectors
+        // Extract likes .....twitter DOM changes so difficult to extract data
         const likesElement = tweetElement.querySelector(
           'div[data-testid="like"] span[data-testid="app-text-transition-container"]'
         );
         const likes = likesElement
           ? parseInt(likesElement.textContent?.replace(/,/g, "") || "0", 10)
           : 0;
-
-        // Similar updates for retweets and comments
 
         // Extract retweets
         const retweetsElement = tweetElement.querySelector(
@@ -194,9 +178,9 @@ export class TwitterScraper {
               ?.textContent || "",
           tweetId: tweetId || "",
           mediaUrls: mediaUrls,
-          likes: likes, // Added likes
-          retweets: retweets, // Added retweets
-          comments: comments, // Added comments
+          likes: likes,
+          retweets: retweets,
+          comments: comments,
           hasVideo: false,
         };
       });
@@ -325,5 +309,5 @@ export class TwitterScraper {
 export const startScraping = async (page: Page, userToTrack: string) => {
   const scraper = new TwitterScraper(page);
   console.log(`✅ Monitoring tweets from @${userToTrack}...`);
-  await scraper.monitorLatestTweets(userToTrack, 30000);
+  await scraper.monitorLatestTweets(userToTrack, frequency);
 };
