@@ -6,7 +6,8 @@ const initializeDatabase = async () => {
   try {
     await sequelize.authenticate();
     console.log("Database connection established successfully.");
-    await sequelize.sync({ alter: true, force: true });
+    await sequelize.sync({});
+    // await sequelize.sync({ alter: true, force: true });
     // await sequelize.sync();
     console.log("Database synced successfully.");
   } catch (error) {
