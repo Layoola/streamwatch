@@ -216,7 +216,6 @@ export class TwitterScraper {
         console.log("⏳ Video detected, waiting for video URL to load...");
         videoUrl = await this.getVideoUrlFromTweetId(tweetData.tweetId);
         if (videoUrl) {
-          console.log("📹 Video URL found:", videoUrl);
           tweetData.mediaUrls.push(videoUrl);
         } else {
           console.log("could not extract video found in tweet");
@@ -257,7 +256,7 @@ export class TwitterScraper {
       try {
         const newTweet = await this.getLatestTweet(username);
         if (newTweet) {
-          console.log("New tweet found:", newTweet);
+          console.log("New tweet found processing...");
 
           if (onNewTweet) {
             await onNewTweet(newTweet);
@@ -275,7 +274,6 @@ export class TwitterScraper {
 
               if (newTweet.mediaUrls.length > 0) {
                 console.log(`🔗 Found media for tweet ${newTweet.tweetId}`);
-                console.log("Media URLs:", newTweet.mediaUrls);
 
                 console.log("Saving media to database...");
 

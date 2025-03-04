@@ -148,7 +148,6 @@ export const saveMedia = async (
   const processedUrls = new Set(); // Avoid processing duplicate URLs
 
   for (const mediaUrl of mediaUrls) {
-    console.log("mediaUrl", mediaUrl);
     try {
       // Skip if already processed
       if (processedUrls.has(mediaUrl)) continue;
@@ -160,9 +159,6 @@ export const saveMedia = async (
       const fileExtension = urlParts.split(".").pop()?.toLowerCase() || "";
       const mediaType =
         new URL(mediaUrl).searchParams.get("format")?.toLowerCase() || "";
-
-      console.log("fileExtension", fileExtension);
-      console.log("mediaType", mediaType);
 
       // Handle images
       if (["jpg", "jpeg", "png", "gif"].includes(mediaType)) {
